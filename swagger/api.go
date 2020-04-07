@@ -425,16 +425,26 @@ func (a *API) RenderJSON() ([]byte, error) {
 
 // RemovePrivate function removes 'private' (where name starts with "-") parameters
 func (a *API) RemovePrivate() {
-	for _, v := range a.Paths {
-		v.Walk(func(e *Endpoint) {
-			newParams := []Parameter{}
-			for _, v := range e.Parameters {
-				if v.Name[0] == '_' {
-					continue
-				}
-				newParams = append(newParams, v)
+	for k, definition := range a.Definitions {
+		properties := map[string]Property{}
+		for name, property := range definition.Properties {
+			if name[0] != '_' {
+				properties[name] = property
 			}
-			e.Parameters = newParams
+		}
+		definition.Properties = properties
+		a.Definitions[k] = definition
+	}
+
+	for _, path := range a.Paths {
+		path.Walk(func(e *Endpoint) {
+			params := []Parameter{}
+			for _, param := range e.Parameters {
+				if param.Name[0] != '_' {
+					params = append(params, param)
+				}
+			}
+			e.Parameters = params
 		})
 	}
 }
