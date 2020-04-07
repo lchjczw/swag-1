@@ -539,10 +539,6 @@ func defineObject(v interface{}) Object {
 				// honor json ignore tag
 				continue
 			}
-			if name[0] == '_' {
-				// skip 'private' fields
-				continue
-			}
 
 			// determine if this field is required or not
 			if v := field.Tag.Get("required"); v == "true" {
