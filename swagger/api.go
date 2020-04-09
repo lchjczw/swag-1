@@ -296,7 +296,6 @@ type API struct {
 	Host                string                 `json:"host,omitempty"`
 	SecurityDefinitions map[string]interface{} `json:"securityDefinitions,omitempty"`
 	Security            *SecurityRequirement   `json:"security,omitempty"`
-	GeneratePrivate     bool                   `json:"-"`
 }
 
 func (a *API) clone() *API {
@@ -417,14 +416,11 @@ func (a *API) Walk(callback func(path string, endpoints *Endpoint)) {
 
 // RenderJSON returns the static swagger schema, as json
 func (a *API) RenderJSON() ([]byte, error) {
-	if !a.GeneratePrivate {
-		a.RemovePrivate()
-	}
 	return json.MarshalIndent(a, "", "  ")
 }
 
-// RemovePrivate function removes 'private' (where name starts with "-") parameters
-func (a *API) RemovePrivate() {
+// RemovePrivate function removes 'private' (where name starts with "_") parameters
+func (a *API) RemovePrivate() *API {
 	for k, definition := range a.Definitions {
 		properties := map[string]Property{}
 		for name, property := range definition.Properties {
@@ -447,4 +443,6 @@ func (a *API) RemovePrivate() {
 			e.Parameters = params
 		})
 	}
+
+	return a
 }

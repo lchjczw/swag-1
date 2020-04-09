@@ -188,13 +188,6 @@ func Security(scheme string, scopes ...string) Option {
 	}
 }
 
-// GeneratePrivate sets GeneratePrivate flag in the API.
-func GeneratePrivate(v bool) Option {
-	return func(builder *Builder) {
-		builder.API.GeneratePrivate = v
-	}
-}
-
 // New constructs a new api builder
 func New(options ...Option) *swagger.API {
 	b := &Builder{
