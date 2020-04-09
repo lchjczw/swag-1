@@ -125,23 +125,6 @@ func TestQuery(t *testing.T) {
 	assert.Equal(t, expected, e.Parameters[0])
 }
 
-func TestQueryPrivate(t *testing.T) {
-	expected := swagger.Parameter{
-		In:          "query",
-		Name:        "_id",
-		Description: "the description",
-		Required:    true,
-		Type:        "string",
-		Format:      "",
-	}
-
-	e := endpoint.New("get", "/", "get thing",
-		endpoint.Query(expected.Name, expected.Type, expected.Format, expected.Description, expected.Required),
-	)
-
-	assert.Equal(t, 0, len(e.Parameters))
-}
-
 func TestQueryList(t *testing.T) {
 	expected := []swagger.Parameter{{
 		Name:        "id",
@@ -152,13 +135,6 @@ func TestQueryList(t *testing.T) {
 		In:          "query",
 	}, {
 		Name:        "other",
-		Description: "the description",
-		Required:    true,
-		Type:        "string",
-		Format:      "",
-		In:          "query",
-	}, {
-		Name:        "_private",
 		Description: "the description",
 		Required:    true,
 		Type:        "string",
@@ -198,14 +174,6 @@ func TestQueryMap(t *testing.T) {
 		},
 		"other": {
 			Name:        "other",
-			Description: "the description",
-			Required:    true,
-			Type:        "string",
-			Format:      "",
-			In:          "query",
-		},
-		"_private": {
-			Name:        "_private",
 			Description: "the description",
 			Required:    true,
 			Type:        "string",

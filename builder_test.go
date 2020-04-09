@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/miketonks/swag"
+	"github.com/miketonks/swag/endpoint"
 	"github.com/miketonks/swag/swagger"
 	"github.com/stretchr/testify/assert"
 )
@@ -150,4 +151,70 @@ func TestSecurity(t *testing.T) {
 	assert.Len(t, api.Security.Requirements, 1)
 	assert.Contains(t, api.Security.Requirements[0], "basic")
 	assert.Equal(t, []string{}, api.Security.Requirements[0]["basic"])
+}
+
+func TestRemovePrivate(t *testing.T) {
+	type Payload struct {
+		Public  string `json:"payload_public"`
+		Private string `json:"_payload_private"`
+	}
+
+	e := endpoint.New("post", "/", "",
+		endpoint.QueryMap(map[string]swagger.Parameter{
+			"query_public": {
+				Name: "query_public",
+				In:   "query",
+			},
+			"_query_private": {
+				Name: "_guery_private",
+				In:   "query",
+			},
+		}),
+		endpoint.Body(Payload{}, "Payload", true))
+
+	api := swag.New(
+		swag.Title("Test"),
+		swag.Description("Test"),
+		swag.BasePath("/"),
+		swag.Endpoints(e),
+	)
+
+	assert.True(t, apiHasParam(api, "query_public"), "query_public parameter should be defined")
+	assert.True(t, apiHasParam(api, "_query_private"), "_query_private parameter should be defined")
+	assert.True(t, apiHasParam(api, "payload_public"), "payload_public parameter should be defined")
+	assert.True(t, apiHasParam(api, "_payload_private"), "_payload_private parameter should be defined")
+
+	api.RemovePrivate()
+
+	assert.True(t, apiHasParam(api, "query_public"), "query_public parameter should be defined")
+	assert.False(t, apiHasParam(api, "_query_private"), "_query_private parameter should not be defined")
+	assert.True(t, apiHasParam(api, "payload_public"), "payload_public parameter should be defined")
+	assert.False(t, apiHasParam(api, "_payload_private"), "_payload_private parameter should not be defined")
+}
+
+func apiHasParam(a *swagger.API, name string) bool {
+	found := false
+	for _, path := range a.Paths {
+		path.Walk(func(e *swagger.Endpoint) {
+			for _, param := range e.Parameters {
+				if param.Name == name {
+					found = true
+					return
+				}
+			}
+		})
+	}
+
+	if !found {
+		for _, definition := range a.Definitions {
+			for key := range definition.Properties {
+				if key == name {
+					found = true
+					break
+				}
+			}
+		}
+	}
+
+	return found
 }

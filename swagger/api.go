@@ -418,3 +418,31 @@ func (a *API) Walk(callback func(path string, endpoints *Endpoint)) {
 func (a *API) RenderJSON() ([]byte, error) {
 	return json.MarshalIndent(a, "", "  ")
 }
+
+// RemovePrivate function removes 'private' (where name starts with "_") parameters
+func (a *API) RemovePrivate() *API {
+	for k, definition := range a.Definitions {
+		properties := map[string]Property{}
+		for name, property := range definition.Properties {
+			if name[0] != '_' {
+				properties[name] = property
+			}
+		}
+		definition.Properties = properties
+		a.Definitions[k] = definition
+	}
+
+	for _, path := range a.Paths {
+		path.Walk(func(e *Endpoint) {
+			params := []Parameter{}
+			for _, param := range e.Parameters {
+				if param.Name[0] != '_' {
+					params = append(params, param)
+				}
+			}
+			e.Parameters = params
+		})
+	}
+
+	return a
+}
