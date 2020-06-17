@@ -587,9 +587,18 @@ func define(v interface{}) map[string]Object {
 
 	for dirty {
 		dirty = false
-		for _, d := range objMap {
+		for i, d := range objMap {
+			if item, ok := customTypes[d.GoType]; ok {
+				tmp := objMap[i]
+				tmp.AdditionalProperties = item.AdditionalProperties != nil
+				objMap[i] = tmp
+				continue
+			}
 			for _, p := range d.Properties {
-				if _, ok := customTypes[p.GoType]; ok {
+				if item, ok := customTypes[d.GoType]; ok {
+					tmp := objMap[i]
+					tmp.AdditionalProperties = item.AdditionalProperties != nil
+					objMap[i] = tmp
 					continue
 				}
 				if p.GoType.Kind() == reflect.Struct {
