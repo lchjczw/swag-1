@@ -497,12 +497,13 @@ func defineObject(v interface{}) Object {
 
 	if t.Kind() != reflect.Struct {
 		p := inspect(t, "")
+		nameTokens := strings.Split(p.GoType.String(), ".")
 		return Object{
 			IsArray:  isArray,
 			GoType:   t,
 			Type:     p.Type,
 			Format:   p.Format,
-			Name:     t.Kind().String(),
+			Name:     nameTokens[len(nameTokens)-1],
 			Required: required,
 		}
 	}
@@ -516,7 +517,7 @@ func defineObject(v interface{}) Object {
 		}
 
 		// If anoynmous - embed it
-		if field.Anonymous == true {
+		if field.Anonymous {
 			obj := defineObject(reflect.New(field.Type).Interface())
 			for k, v := range obj.Properties {
 				properties[k] = v
