@@ -98,6 +98,7 @@ type Endpoint struct {
 	Handler     interface{}         `json:"-"`
 	Parameters  []Parameter         `json:"parameters,omitempty"`
 	Responses   map[string]Response `json:"responses,omitempty"`
+	Deprecated  bool                `json:"deprecated,omitempty"`
 
 	// swagger spec requires security to be an array of objects
 	Security *SecurityRequirement `json:"security,omitempty"`
