@@ -63,6 +63,14 @@ func TestDescription(t *testing.T) {
 	assert.Equal(t, "blah", e.Description)
 }
 
+func TestDepreaceted(t *testing.T) {
+	e := endpoint.New("get", "/", "get thing",
+		endpoint.Deprecated(true),
+	)
+
+	assert.Equal(t, true, e.Deprecated)
+}
+
 func TestOperationId(t *testing.T) {
 	e := endpoint.New("get", "/", "get thing",
 		endpoint.OperationID("blah"),

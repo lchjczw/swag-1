@@ -261,6 +261,13 @@ func Tags(tags ...string) Option {
 	}
 }
 
+// Deprecated allows specify the endpoint is deprecated
+func Deprecated(deprecated bool) Option {
+	return func(b *Builder) {
+		b.Endpoint.Deprecated = deprecated
+	}
+}
+
 // Security allows a security scheme to be associated with the endpoint.
 func Security(scheme string, scopes ...string) Option {
 	return func(b *Builder) {
